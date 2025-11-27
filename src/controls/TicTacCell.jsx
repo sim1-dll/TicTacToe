@@ -7,7 +7,7 @@ return (<div
                                   (isHoverable ? 'enabled' : '')
             }
             onClick={() => {
-                                if (!frozen) 
+                                if (!frozen && !play) 
                                     {click(idx);}
                          }}
                      >
