@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import TicTacGrid from './controls/TicTacGrid';
 import { getAIMove } from './ai';
+import { findBestMove } from './aiMinMax'
 
 export default function App() {
   const [cells, setCells] = useState(new Array(9).fill({play:'',winner:false}));
@@ -66,17 +67,7 @@ export default function App() {
    * Returns true if there are available moves
    */
   function movesAvailable(cells){
-    let emptyCells = false;
-    for(let i=0;i < cells.length;i++)
-    {
-        if (cells[i].play === '')
-        {
-            emptyCells = true;
-            break;
-        }
-    }
-
-    return emptyCells;
+    return !cells.every((c) => c.play != '');
   }
 
   function switchPlayer(np) {
@@ -144,7 +135,14 @@ export default function App() {
 
     if (aiEnabled && !r.isGameOver)
     {
-      let aiMove = getAIMove(r.nextCells)
+      let simpleCells = r.nextCells.map((c) => {return c.play;});
+
+      //impossible mode
+      let aiMove = findBestMove(simpleCells);
+
+      //easy mode
+      //let aiMove = getAIMove(r.nextCells)
+
       if (aiMove != -1)
       {
         r = makeMove(aiMove, r.nextCells, np);
@@ -193,19 +191,26 @@ export default function App() {
 
       <TicTacGrid cells={cells} cellClick={cellClick} frozen={frozen}></TicTacGrid>
 
-      <div style={{
-        margin: '5px',
-        justifySelf : 'right'
-      }}>
-            <input type="checkbox" id="cpu_cb" name="cpu_cb" onChange={aiModeChange} checked={aiEnabled}  />
-            <label htmlFor="cpu_cb">vs CPU</label>
-      </div>
+          <div style={{display:'flex'}}>
+                  <div style={{
+                    margin: '5px 5px 0px 5px',
+                    marginLeft: 'auto'
+                  }}>
+                        <input type="checkbox" id="cpu_cb" name="cpu_cb" onChange={aiModeChange} checked={aiEnabled}  />
+                        <label htmlFor="cpu_cb">vs CPU</label>
+                  </div>
+            </div>
 
-      <div style={{
-        margin: '5px'
-      }}>
-        <button onClick={() => {newGame();}}>New Game</button>
-      </div>
+            <button style={{display:'flex', margin: '5px auto'}} 
+                onClick={() => {newGame();}}>New Game</button>
+
+
+              {/* <button style={{display:'flex', margin: '5px'}} 
+                onClick={() => {newGame();}}>New Game <small><i>1v1</i></small></button> */}
+
+              {/* <button style={{display:'flex', margin: '5px'}} 
+                onClick={() => {newGame();}}>New Game <small><i>vs CPU</i></small></button> */}
+
     </>
   );
 }
